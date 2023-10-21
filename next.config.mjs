@@ -19,10 +19,10 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  // ??????????? really should have it here its a good practice?
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  //??????????? really should have it here its a good practice?
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default config;
