@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/nextjs";
 //დააკვირდი როგორ აკეთებ არა User ის იმპორტს არამედ მისი type ის
 import type { User } from "@clerk/nextjs/dist/types/server";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 
@@ -17,22 +18,37 @@ const filterUserForClient = (user: User) => {
 export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.db.post.findMany({
-      //The take parameter in the findMany() method of Prisma Client specifies the maximum number of results to return. In the example you provided, the findMany() method will return up to 100 posts.
       take: 100,
     });
 
     const users = (
       await clerkClient.users.getUserList({
         userId: posts.map((post) => post.authorId as string),
-        //The take and limit keywords are both used to specify the maximum number of results to return from a query. The main difference between the two keywords is that take is used in Prisma Client, while limit is used in other database libraries, such as MySQL and PostgreSQL.
+
         limit: 100,
       })
     ).map(filterUserForClient);
 
-    //now for each post we grabbing the user that made it using the authorid
-    return posts.map((post) => ({
-      post,
-      author: users.find((user) => user.id === post.authorId),
-    }));
+    //დავამატეთ null check for username as well
+    return posts.map((post) => {
+      const author = users.find((user) => user.id === post.authorId);
+
+      //პირველი null ჩექი რაც ქვემოთ return ში author ს და author.usrname ს გადააკეთებდ from sting|null to sting
+      if (!author || !author.username) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Author or username for post not found",
+        });
+      }
+
+      //აქ გადავაკეთეთ author ესე რადგან username type ყოფილიყო სტრინგი და არა string|null ი
+      return {
+        post,
+        author: {
+          ...author,
+          username: author.username,
+        },
+      };
+    });
   }),
 });

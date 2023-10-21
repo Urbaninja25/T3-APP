@@ -2,7 +2,12 @@ import Head from "next/head";
 
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 
-import { api } from "~/utils/api";
+import { api, RouterOutputs } from "~/utils/api";
+//!!!!!!!!!!!!!
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
@@ -23,13 +28,32 @@ const CreatePostWizard = () => {
   );
 };
 
+type PostWithUser = RouterOutputs["post"]["getAll"][number];
+
+const Postview = (props: PostWithUser) => {
+  const { post, author } = props;
+
+  return (
+    <div key={post.id} className="flex gap-3 border-b border-slate-400 p-4">
+      <img src={author.imageUrl} className="h-14 w-14 rounded-full" />
+      <div className="flex flex-col">
+        <div className="flex gap-1  font-bold ">
+          <span className="text-slate-300">{`@${author.username}`}</span>
+          <span className="font-thin text-gray-400 antialiased">{`· ${dayjs(
+            post.createdAt,
+          ).fromNow()}`}</span>
+        </div>
+        <span>{post.content}</span>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
-  //curremy user?
   const user = useUser();
 
   const { data } = api.post.getAll.useQuery();
 
-  // if (isLoading) return <div>loading..</div>;
   if (!data) return <div>something went wrong i guess..</div>;
 
   return (
@@ -52,10 +76,8 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col">
-            {[...data, ...data]?.map(({ post, author }) => (
-              <div key={post.id} className="border-slate-4 border-b p-8">
-                {post.content}
-              </div>
+            {[...data, ...data]?.map((fullPost) => (
+              <Postview {...fullPost} key={fullPost.post.id} />
             ))}
           </div>
         </div>
