@@ -76,7 +76,7 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col">
-            {[...data]?.map((fullPost) => (
+            {[...data, ...data]?.map((fullPost) => (
               <Postview {...fullPost} key={fullPost.post.id} />
             ))}
           </div>
