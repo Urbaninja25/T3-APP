@@ -1,7 +1,7 @@
 import { clerkClient } from "@clerk/nextjs";
 //დააკვირდი როგორ აკეთებ არა User ის იმპორტს არამედ მისი type ის
 import type { User } from "@clerk/nextjs/dist/types/server";
-import { z } from "zod";
+// import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
