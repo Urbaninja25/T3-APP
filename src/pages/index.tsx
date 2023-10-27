@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { type NextPage } from "next";
 
 import { useUser, SignInButton, UserButton } from "@clerk/nextjs";
 
@@ -9,6 +10,7 @@ import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import { LoadingPage } from "~/componenets/loading";
 
 dayjs.extend(relativeTime);
 
@@ -62,12 +64,31 @@ const Postview = (props: PostWithUser) => {
   );
 };
 
-export default function Home() {
-  const user = useUser();
+//გავიტაენთ ეს სხვა კომპონენტად.ანუ ესაა ქვემოთა feed ი .ეს იმიტო ვქენი რო რეალურად ზემოთ ჩვენ ვიყენებთ მხოლოდ clerk დატას ხოლო feed ში db დატას.და რეალურად კლერკი ეგრევე მაწვდის ინფოს დბ ს კი დრო ჭირდება.ამიტომ მე მინდა რო კლერკის დატა ეგრევე გამოჩნდეს ხოლო feed ში ქვემოთ მქონდეს loading spinner ი
+const Feed = () => {
+  const { data, isLoading: postsLoading } = api.post.getAll.useQuery();
 
-  const { data } = api.post.getAll.useQuery();
+  if (postsLoading) return <LoadingPage />;
 
-  if (!data) return <div>something went wrong i guess..</div>;
+  if (!data) return <div>something went wrong.CALL NUGI FIRST !</div>;
+
+  return (
+    <div className="flex flex-col">
+      {[...data, ...data]?.map((fullPost) => (
+        <Postview {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  // A boolean that until Clerk loads and initializes, will be set to false. Once Clerk loads, isLoaded will be set to true.
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
+  //the reason why we have these here is to start fetching data early,asap.ამაში დაგვეხმარება usequery რომელსაც აქ ეს უნარი loading stateებთან ერთად :
+  //Caching: It often includes a caching mechanism, which means that if the same query is made multiple times, the data can be fetched from a local cache if it's available. This helps reduce the number of unnecessary network requests and improves performance.
+  api.post.getAll.useQuery();
+
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -79,22 +100,19 @@ export default function Home() {
       <main className="flex justify-center">
         <div className="h-screen w-full border-x  border-slate-400 md:max-w-2xl">
           <div className="flex border-b border-slate-400 p-4">
-            {!user.isSignedIn && (
+            {!isSignedIn && (
               <div className="flex justify-center">
                 <SignInButton />
               </div>
             )}
-            {user.isSignedIn && CreatePostWizard()}
-            {user.isSignedIn && <UserButton />}
+            {isSignedIn && CreatePostWizard()}
+            {isSignedIn && <UserButton />}
           </div>
-
-          <div className="flex flex-col">
-            {[...data, ...data]?.map((fullPost) => (
-              <Postview {...fullPost} key={fullPost.post.id} />
-            ))}
-          </div>
+          <Feed />
         </div>
       </main>
     </>
   );
-}
+};
+
+export default Home;
