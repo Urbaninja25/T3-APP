@@ -4,9 +4,12 @@ import type { User } from "@clerk/nextjs/dist/types/server";
 // import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  privateProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 
-//ton of info ს გვიბრუნებს users ქვემოთ  about user ჩვენ კიდე არ გვაინტერესებ ამდენი რამე ამიტომ მაქ აქ ეს ფუნქცია რომელიც server side filtering ს გააკეთებს ამ შემთხვევაში
 const filterUserForClient = (user: User) => {
   return {
     id: user.id,
@@ -23,17 +26,16 @@ export const postRouter = createTRPCRouter({
 
     const users = (
       await clerkClient.users.getUserList({
+        // ???????????
         userId: posts.map((post) => post.authorId as string),
 
         limit: 100,
       })
     ).map(filterUserForClient);
 
-    //დავამატეთ null check for username as well
     return posts.map((post) => {
       const author = users.find((user) => user.id === post.authorId);
 
-      //პირველი null ჩექი რაც ქვემოთ return ში author ს და author.usrname ს გადააკეთებდ from sting|null to sting
       if (!author || !author.username) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -41,7 +43,6 @@ export const postRouter = createTRPCRouter({
         });
       }
 
-      //აქ გადავაკეთეთ author ესე რადგან username type ყოფილიყო სტრინგი და არა string|null ი
       return {
         post,
         author: {
@@ -50,5 +51,10 @@ export const postRouter = createTRPCRouter({
         },
       };
     });
+  }),
+
+  //ვქმნით ახალ create method ს რომელსაც ctx ში ექნება currentuser
+  create: privateProcedure.mutation(async ({ ctx }) => {
+    const authorId = ctx.currentUser.id;
   }),
 });

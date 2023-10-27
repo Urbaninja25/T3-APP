@@ -12,7 +12,9 @@ import superjson from "superjson";
 import { ZodError } from "zod";
 
 import { db } from "~/server/db";
-
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+import { getAuth } from "@clerk/nextjs/server";
+import { TRPCError } from "@trpc/server";
 /**
  * 1. CONTEXT
  *
@@ -21,32 +23,24 @@ import { db } from "~/server/db";
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
-type CreateContextOptions = Record<string, never>;
-
-/**
- * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
- * it from here.
- *
- * Examples of things you may need it for:
- * - testing, so we don't have to mock Next.js' req/res
- * - tRPC's `createSSGHelpers`, where we don't have req/res
- *
- * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
- */
-const createInnerTRPCContext = (_opts: CreateContextOptions) => {
-  return {
-    db,
-  };
-};
-
 /**
  * This is the actual context you will use in your router. It will be used to process every request
  * that goes through your tRPC endpoint.
  *
  * @see https://trpc.io/docs/context
  */
-export const createTRPCContext = (_opts: CreateNextContextOptions) => {
-  return createInnerTRPCContext({});
+//!!!!!!!!! do these and inside opt(options) we actually have a request
+export const createTRPCContext = (opts: CreateNextContextOptions) => {
+  //so these is a next js request from an api which u can actually pass to stuff and clerck
+  const { req } = opts;
+  //getauth clerk იდან გვაქვს.დააკირდი რო getauth ს ხმარობ კლერკიდან getuser ის მაგივრად,- becouse technically we are not going to fetch the user from clerk each time since clerck is using jwts and able to verify on your server whether or not user is authenticated using the sogniture of jwt allowing them to skip a callback to their server
+
+  const sesh = getAuth(req);
+  const user = sesh.user;
+  return {
+    db,
+    currentUser: user,
+  };
 };
 
 /**
@@ -93,3 +87,22 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure;
+
+//!!!!!!!!!!!!!!! its like a middlware before main request which enforces that session exist
+//t helper for trpc
+const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.currentUser) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+
+  return next({
+    ctx: {
+      currentUser: ctx.currentUser,
+    },
+  });
+});
+
+//and now u have private procidure that will be used will always have authentication object
+export const privateProcedure = t.procedure.use(enforceUserIsAuthed);
