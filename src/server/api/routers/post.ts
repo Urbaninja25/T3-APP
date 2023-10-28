@@ -30,7 +30,7 @@ export const postRouter = createTRPCRouter({
 
     const users = (
       await clerkClient.users.getUserList({
-        // ???????????
+        // syntax is Clerk-specific syntax. It is used to filter a list of users by the author IDs of a list of posts. It is not a standard JavaScript syntax.
         userId: posts.map((post) => post.authorId as string),
         limit: 100,
       })
