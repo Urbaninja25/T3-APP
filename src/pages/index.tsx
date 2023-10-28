@@ -33,7 +33,7 @@ const CreatePostWizard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex w-full gap-3">
+    <div className="flex w-full  gap-3">
       <Image
         className="h-16 w-16 rounded-full"
         src={user.imageUrl}
@@ -50,7 +50,10 @@ const CreatePostWizard = () => {
         disabled={isPosting}
       />
 
-      <button onClick={() => mutate({ content: input })}> POST </button>
+      <button className="mr-14" onClick={() => mutate({ content: input })}>
+        {" "}
+        POST{" "}
+      </button>
     </div>
   );
 };
@@ -120,7 +123,6 @@ const Home: NextPage = () => {
               </div>
             )}
             {isSignedIn && CreatePostWizard()}
-            {/* useer logout btn გამოსაწევიგაქ  */}
             {isSignedIn && <UserButton />}
           </div>
           <Feed />
