@@ -17,19 +17,15 @@ dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
-  // input ის state ს ვამენეჯებ
-  const [input, setInput] = useState("");
-  //მივწვდი კონტექსტს
-  const ctx = api.useContext();
-  // mutate is a function returned by the useMutation hook from the api.post.create. It is commonly used for making mutations, which typically involve creating or updating data on the server. In this case, it's used to create a new post based on the input value (the content of the post).
 
-  //isLoading is an alias for the isPosting variable, which indicates whether the mutation is in progress. When isPosting is true, it can be used to disable the input field and button, preventing the user from sending multiple requests while the previous request is still being processed.
+  const [input, setInput] = useState("");
+
+  const ctx = api.useContext();
+
   const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess: () => {
-      //clear input fields
       setInput("");
-      //აქ void იმიტო დაწერე წინ რო typescripts ვუთხრათ რო კი შენ გაქ მასთან პრობლემა იმიტორო promise ია მარა მე ეგ როგორც ფრომისი არ მაინტერესებს მთავარია ბეგრაუნდ call გააკეთოსო
-      // with the code ctx.post.getAll.invalidate(), you're manually triggering a refresh of the query by invalidating it.
+
       void ctx.post.getAll.invalidate();
     },
   });
@@ -49,13 +45,11 @@ const CreatePostWizard = () => {
         placeholder="Type something!"
         className="grow bg-transparent outline-none"
         type="text"
-        // ვამენეჯებ input state ს
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        //This line sets the disabled attribute of the <input> element to true when isPosting is true. This prevents the user from editing the input field while a post is being created. It's a common practice to disable input fields during an ongoing action to prevent user interactions that might interfere with the process.
         disabled={isPosting}
       />
-      {/* This button element triggers the mutate function when clicked. It sends a request to create a new post with the content provided in the input field */}
+
       <button onClick={() => mutate({ content: input })}> POST </button>
     </div>
   );
@@ -104,7 +98,7 @@ const Feed = () => {
   );
 };
 
-// ?????????????what these nextpage do ?
+// if you want to render a page on next, you should use NextPage
 const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
 
