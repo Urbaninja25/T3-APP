@@ -36,10 +36,10 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
   //getauth clerk იდან გვაქვს.დააკირდი რო getauth ს ხმარობ კლერკიდან getuser ის მაგივრად,- becouse technically we are not going to fetch the user from clerk each time since clerck is using jwts and able to verify on your server whether or not user is authenticated using the sogniture of jwt allowing them to skip a callback to their server
 
   const sesh = getAuth(req);
-  const user = sesh.user;
+  const userId = sesh.userId;
   return {
     db,
-    currentUser: user,
+    userId,
   };
 };
 
@@ -91,7 +91,7 @@ export const publicProcedure = t.procedure;
 //!!!!!!!!!!!!!!! its like a middlware before main request which enforces that session exist
 //t helper for trpc
 const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
-  if (!ctx.currentUser) {
+  if (!ctx.userId) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
     });
@@ -99,7 +99,7 @@ const enforceUserIsAuthed = t.middleware(async ({ ctx, next }) => {
 
   return next({
     ctx: {
-      currentUser: ctx.currentUser,
+      userId: ctx.userId,
     },
   });
 });

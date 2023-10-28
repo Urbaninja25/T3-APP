@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Head from "next/head";
 import { type NextPage } from "next";
 
@@ -16,6 +17,22 @@ dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
+  // input ის state ს ვამენეჯებ
+  const [input, setInput] = useState("");
+  //მივწვდი კონტექსტს
+  const ctx = api.useContext();
+  // mutate is a function returned by the useMutation hook from the api.post.create. It is commonly used for making mutations, which typically involve creating or updating data on the server. In this case, it's used to create a new post based on the input value (the content of the post).
+
+  //isLoading is an alias for the isPosting variable, which indicates whether the mutation is in progress. When isPosting is true, it can be used to disable the input field and button, preventing the user from sending multiple requests while the previous request is still being processed.
+  const { mutate, isLoading: isPosting } = api.post.create.useMutation({
+    onSuccess: () => {
+      //clear input fields
+      setInput("");
+      //აქ void იმიტო დაწერე წინ რო typescripts ვუთხრათ რო კი შენ გაქ მასთან პრობლემა იმიტორო promise ია მარა მე ეგ როგორც ფრომისი არ მაინტერესებს მთავარია ბეგრაუნდ call გააკეთოსო
+      // with the code ctx.post.getAll.invalidate(), you're manually triggering a refresh of the query by invalidating it.
+      void ctx.post.getAll.invalidate();
+    },
+  });
 
   if (!user) return null;
 
@@ -29,10 +46,17 @@ const CreatePostWizard = () => {
         height={56}
       />
       <input
-        placeholder="Type some emojis!"
+        placeholder="Type something!"
         className="grow bg-transparent outline-none"
         type="text"
+        // ვამენეჯებ input state ს
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        //This line sets the disabled attribute of the <input> element to true when isPosting is true. This prevents the user from editing the input field while a post is being created. It's a common practice to disable input fields during an ongoing action to prevent user interactions that might interfere with the process.
+        disabled={isPosting}
       />
+      {/* This button element triggers the mutate function when clicked. It sends a request to create a new post with the content provided in the input field */}
+      <button onClick={() => mutate({ content: input })}> POST </button>
     </div>
   );
 };
@@ -55,7 +79,7 @@ const Postview = (props: PostWithUser) => {
         <div className="flex gap-1  font-bold ">
           <span className="text-slate-300">{`@${author.username}`}</span>
           <span className="font-thin text-gray-400 antialiased">{`· ${dayjs(
-            post.createdAt,
+            post.created_at,
           ).fromNow()}`}</span>
         </div>
         <span className="text-xl">{post.content}</span>
@@ -64,7 +88,6 @@ const Postview = (props: PostWithUser) => {
   );
 };
 
-//გავიტაენთ ეს სხვა კომპონენტად.ანუ ესაა ქვემოთა feed ი .ეს იმიტო ვქენი რო რეალურად ზემოთ ჩვენ ვიყენებთ მხოლოდ clerk დატას ხოლო feed ში db დატას.და რეალურად კლერკი ეგრევე მაწვდის ინფოს დბ ს კი დრო ჭირდება.ამიტომ მე მინდა რო კლერკის დატა ეგრევე გამოჩნდეს ხოლო feed ში ქვემოთ მქონდეს loading spinner ი
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.post.getAll.useQuery();
 
@@ -74,19 +97,16 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {[...data, ...data]?.map((fullPost) => (
+      {data?.map((fullPost) => (
         <Postview {...fullPost} key={fullPost.post.id} />
       ))}
     </div>
   );
 };
 
+// ?????????????what these nextpage do ?
 const Home: NextPage = () => {
-  // A boolean that until Clerk loads and initializes, will be set to false. Once Clerk loads, isLoaded will be set to true.
   const { isLoaded: userLoaded, isSignedIn } = useUser();
-  //the reason why we have these here is to start fetching data early,asap.ამაში დაგვეხმარება usequery რომელსაც აქ ეს უნარი loading stateებთან ერთად :
-  //Caching: It often includes a caching mechanism, which means that if the same query is made multiple times, the data can be fetched from a local cache if it's available. This helps reduce the number of unnecessary network requests and improves performance.
-  api.post.getAll.useQuery();
 
   if (!userLoaded) return <div />;
 
@@ -106,6 +126,7 @@ const Home: NextPage = () => {
               </div>
             )}
             {isSignedIn && CreatePostWizard()}
+            {/* useer logout btn გამოსაწევიგაქ  */}
             {isSignedIn && <UserButton />}
           </div>
           <Feed />

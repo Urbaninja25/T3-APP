@@ -1,7 +1,7 @@
 import { clerkClient } from "@clerk/nextjs";
 //დააკვირდი როგორ აკეთებ არა User ის იმპორტს არამედ მისი type ის
 import type { User } from "@clerk/nextjs/dist/types/server";
-// import { z } from "zod";
+import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 
 import {
@@ -22,13 +22,16 @@ export const postRouter = createTRPCRouter({
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.db.post.findMany({
       take: 100,
+      // impliment ordering so new posts come first
+      orderBy: {
+        created_at: "desc",
+      },
     });
 
     const users = (
       await clerkClient.users.getUserList({
         // ???????????
         userId: posts.map((post) => post.authorId as string),
-
         limit: 100,
       })
     ).map(filterUserForClient);
@@ -53,8 +56,21 @@ export const postRouter = createTRPCRouter({
     });
   }),
 
-  //ვქმნით ახალ create method ს რომელსაც ctx ში ექნება currentuser
-  create: privateProcedure.mutation(async ({ ctx }) => {
-    const authorId = ctx.currentUser.id;
-  }),
+  create: privateProcedure
+    .input(
+      // !!!!!!!!!!!!!
+      z.object({
+        content: z.string().emoji("Only emojis are allowed").min(1).max(280),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const authorId = ctx.userId;
+      const post = await ctx.db.post.create({
+        data: {
+          authorId,
+          content: input.content,
+        },
+      });
+      return post;
+    }),
 });
