@@ -11,7 +11,8 @@ import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingPage } from "~/componenets/loading";
+import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
+import toast from "react-hot-toast";
 
 dayjs.extend(relativeTime);
 
@@ -28,12 +29,16 @@ const CreatePostWizard = () => {
 
       void ctx.post.getAll.invalidate();
     },
+    // !!!!!!!!!
+    onError: () => {
+      toast.error("Failed to post! please try again later or call Nugi");
+    },
   });
 
   if (!user) return null;
 
   return (
-    <div className="flex w-full  gap-3">
+    <div className="flex w-full  gap-3 ">
       <Image
         className="h-16 w-16 rounded-full"
         src={user.imageUrl}
@@ -47,13 +52,32 @@ const CreatePostWizard = () => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        // !!!!!!!!onKeyDown: This is the React event handler that is called when the user presses a key on the keyboard.
+
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            // e.preventDefault(): This method is called to prevent the default behavior of the Enter key, which is to submit the form.
+            e.preventDefault();
+            if (input !== "") {
+              // mutate({ content: input }): This function is called to create a new post with the content that the user entered.
+              mutate({ content: input });
+            }
+          }
+        }}
         disabled={isPosting}
       />
 
-      <button className="mr-14" onClick={() => mutate({ content: input })}>
-        {" "}
-        POST{" "}
-      </button>
+      {/* !!!! */}
+      {input !== "" && !isPosting && (
+        <button className="mr-10" onClick={() => mutate({ content: input })}>
+          Post
+        </button>
+      )}
+      {isPosting && (
+        <div className="mr-10 flex items-center justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };
