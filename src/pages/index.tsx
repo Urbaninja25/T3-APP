@@ -69,9 +69,16 @@ const CreatePostWizard = () => {
 
       {/* !!!! */}
       {input !== "" && !isPosting && (
-        <button className="mr-10" onClick={() => mutate({ content: input })}>
-          Post
+        <button
+          className="focus:shadow-outline m-2 mr-10 h-10 rounded-lg bg-gray-700 px-5 text-gray-100 transition-colors duration-150 hover:bg-gray-800"
+          onClick={() => mutate({ content: input })}
+        >
+          post
         </button>
+
+        // <button className=" mr-10 " onClick={() => mutate({ content: input })}>
+        //   Post
+        // </button>
       )}
       {isPosting && (
         <div className="mr-10 flex items-center justify-center">
