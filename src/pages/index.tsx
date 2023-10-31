@@ -131,7 +131,6 @@ const Feed = () => {
   );
 };
 
-// if you want to render a page on next, you should use NextPage
 const Home: NextPage = () => {
   const { isLoaded: userLoaded, isSignedIn } = useUser();
 
