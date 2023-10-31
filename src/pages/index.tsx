@@ -13,6 +13,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
 import { LoadingPage, LoadingSpinner } from "~/componenets/loading";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 dayjs.extend(relativeTime);
 
@@ -29,7 +30,7 @@ const CreatePostWizard = () => {
 
       void ctx.post.getAll.invalidate();
     },
-    // !!!!!!!!!
+
     onError: () => {
       toast.error("Failed to post! please try again later or call Nugi");
     },
@@ -52,14 +53,10 @@ const CreatePostWizard = () => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        // !!!!!!!!onKeyDown: This is the React event handler that is called when the user presses a key on the keyboard.
-
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            // e.preventDefault(): This method is called to prevent the default behavior of the Enter key, which is to submit the form.
             e.preventDefault();
             if (input !== "") {
-              // mutate({ content: input }): This function is called to create a new post with the content that the user entered.
               mutate({ content: input });
             }
           }
@@ -75,10 +72,6 @@ const CreatePostWizard = () => {
         >
           post
         </button>
-
-        // <button className=" mr-10 " onClick={() => mutate({ content: input })}>
-        //   Post
-        // </button>
       )}
       {isPosting && (
         <div className="mr-10 flex items-center justify-center">
@@ -105,10 +98,16 @@ const Postview = (props: PostWithUser) => {
       />
       <div className="flex flex-col">
         <div className="flex gap-1  font-bold ">
-          <span className="text-slate-300">{`@${author.username}`}</span>
-          <span className="font-thin text-gray-400 antialiased">{`· ${dayjs(
-            post.created_at,
-          ).fromNow()}`}</span>
+          {/* next js link component which are more fast and powerful */}
+          {/* why on that link we go to slug pag icant figure put ???????? */}
+          <Link href={`/@${author.username}`}>
+            <span className="text-slate-300">{`@${author.username}`}</span>
+          </Link>
+          <Link href={`/post/${post.id}`}>
+            <span className="font-thin text-gray-400 antialiased">{`· ${dayjs(
+              post.created_at,
+            ).fromNow()}`}</span>
+          </Link>
         </div>
         <span className="text-xl">{post.content}</span>
       </div>
