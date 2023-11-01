@@ -1,10 +1,11 @@
 import { clerkClient } from "@clerk/nextjs";
 //დააკვირდი როგორ აკეთებ არა User ის იმპორტს არამედ მისი type ის
-import type { User } from "@clerk/nextjs/dist/types/server";
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+// !!!!!
+import { filterUserForClient } from "~/server/helpers/filterUserForClient";
 
 import {
   createTRPCRouter,
@@ -12,15 +13,6 @@ import {
   publicProcedure,
 } from "~/server/api/trpc";
 
-const filterUserForClient = (user: User) => {
-  return {
-    id: user.id,
-    username: user.username,
-    imageUrl: user.imageUrl,
-  };
-};
-
-// Create a new ratelimiter, that allows 3 requests per 1 minute
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(3, "1 m"),
