@@ -1,53 +1,57 @@
-import Head from "next/head";
-import { type NextPage } from "next";
+import { createServerSideHelpers } from "@trpc/react-query/server";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+} from "next";
 import { api } from "~/utils/api";
-import { createSSGHelpers } from "@trpc/react/ssg";
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
-import { db } from "~/server/db";
 import { appRouter } from "~/server/api/root";
 import superjson from "superjson";
+import Head from "next/head";
+import { db } from "~/server/db";
 
 export async function getServerSideProps(
-  context: GetServerSidePropsContext<{ id: string }>,
+  context: GetServerSidePropsContext<{ slug: string }>,
 ) {
-  const ssg = createSSGHelpers({
+  const helpers = createServerSideHelpers({
     router: appRouter,
-    ctx: db,
+    ctx: { db, userId: null },
     transformer: superjson,
   });
-  const id = context.params?.id as string;
-  /*
-   * Prefetching the `post.byId` query here.
-   * `prefetchQuery` does not return the result - if you need that, use `fetchQuery` instead.
-   */
-  await ssg.prefetchQuery("post.byId", {
-    id,
-  });
-  // Make sure to return { props: { trpcState: ssg.dehydrate() } }
+  const slug = context.params?.slug as string;
+  if (typeof slug !== "string") throw new Error("no slug");
+
+  const username = slug.replace("@", "");
+  await helpers.profile.getUserByUsername.prefetch({ username });
+  // Make sure to return { props: { trpcState: helpers.dehydrate() } }
+
   return {
     props: {
-      trpcState: ssg.dehydrate(),
-      id,
+      trpcState: helpers.dehydrate(),
+      username,
     },
   };
 }
-const ProfilePage: NextPage = () => {
-  const { data, isLoading } = api.profile.getUserByUsername.useQuery({
-    username: "urbaninja25",
-  });
-  if (isLoading) return <div> LOADING NU SHEMCEM </div>;
-  if (!data) return <div>404</div>;
 
+export default function ProfileViewPage(
+  props: InferGetServerSidePropsType<typeof getServerSideProps>,
+) {
+  const { username } = props;
+
+  const userQuery = api.profile.getUserByUsername.useQuery({ username });
+  if (userQuery.status !== "success") {
+    // won't happen since the query has been prefetched return <div> LOADING NU SHEMCEM </div>;
+    return <>Loading...NU SHEMCEM</>;
+  }
+
+  if (!props) return <div>404</div>;
   return (
     <>
       <Head>
         <title>Profile</title>
       </Head>
       <main className="flex justify-center">
-        <div>{data.username}</div>
+        <div>{props.username}</div>
       </main>
     </>
   );
-};
-
-export default ProfilePage;
+}
