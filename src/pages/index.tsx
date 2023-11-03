@@ -115,6 +115,18 @@ const Postview = (props: PostWithUser) => {
   );
 };
 
+interface FullPost {
+  post: {
+    id: number;
+    // Other properties of post
+  };
+  author: {
+    id: string;
+    username: string;
+    // Other properties of author
+  };
+}
+
 const Feed = () => {
   const { data, isLoading: postsLoading } = api.post.getAll.useQuery();
 
@@ -124,7 +136,7 @@ const Feed = () => {
 
   return (
     <div className="flex flex-col">
-      {data?.map((fullPost) => (
+      {data?.map((fullPost: FullPost) => (
         <Postview {...fullPost} key={fullPost.post.id} />
       ))}
     </div>
