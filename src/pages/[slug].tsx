@@ -55,7 +55,7 @@ export default function ProfileViewPage(
   return (
     <>
       <Head>
-        <title>Profile</title>
+        <title>{username}</title>
       </Head>
       <main className="flex justify-center">
         <div>{props.username}</div>

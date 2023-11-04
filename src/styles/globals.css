@@ -2,8 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Yes, the Tailwind CSS properties you have provided at the top of your CSS file will style everything inside of the main component. */
 body {
   @apply bg-black text-slate-100;
 
+  /* რო სქროლავ და დაამავრე სქროლვა მარა bouncing ს აკეთებს ბროწსერ და კიდევ სქროლავს ხოიცი აი ეგ ირთვება ამით  */
   overscroll-behavior: none;
 }
