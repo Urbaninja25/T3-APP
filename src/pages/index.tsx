@@ -118,12 +118,14 @@ const Postview = (props: PostWithUser) => {
 interface FullPost {
   post: {
     id: string;
-    // Other properties of post
+    created_at: Date; // Add the missing properties
+    content: string;
+    authorId: string;
   };
   author: {
     id: string;
     username: string;
-    // Other properties of author
+    imageUrl: string;
   };
 }
 
