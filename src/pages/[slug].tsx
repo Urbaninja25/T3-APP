@@ -9,17 +9,16 @@ import superjson from "superjson";
 import Head from "next/head";
 import { db } from "~/server/db";
 
-//The getServerSideProps function fetches the user data for the given slug and returns the data as props for the ProfileViewPage component.
+// The getServerSideProps function is used to fetch data on the server and pass it to the component as props. This can be used to improve the performance of the application by prefetching data and rendering the page on the server.
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ slug: string }>,
 ) {
-  ////The createServerSideHelpers function creates a set of helpers that can be used to prefetch and fetch data from the API. The
   const helpers = createServerSideHelpers({
     router: appRouter,
     ctx: { db, userId: null },
     transformer: superjson,
   });
-  const slug = context.params?.slug as string;
+  const slug = context.params?.slug;
   if (typeof slug !== "string") throw new Error("no slug");
 
   const username = slug.replace("@", "");
@@ -32,14 +31,20 @@ export async function getServerSideProps(
 
   return {
     props: {
-      //The helpers.dehydrate function dehydrates the TRPC state, which can be used to rehydrate the state on the client.
       trpcState: helpers.dehydrate(),
       username,
     },
   };
 }
 
-//The ProfileViewPage component uses the api.profile.getUserByUsername.useQuery hook to fetch the user data for the given username. If the data is not yet available, the component renders a loading indicator. If the data is not available, the component renders a 404 page. Otherwise, the component renders the profile page.
+//The ProfileViewPage component will render all of its components on every render, but it will have the username data ready to use. This means that the page will render faster than if the username data had to be fetched from the server on every render.
+
+//BUT BUT BUT
+//When you refresh the slug page, the following will happen:
+
+//The existing cache for the page will be deleted.
+//The getServerSideProps function will be executed again and the data will be cached.
+//The ProfileViewPage component will be rendered.
 export default function ProfileViewPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
@@ -50,7 +55,6 @@ export default function ProfileViewPage(
     // won't happen since the query has been prefetched return <div> LOADING NU SHEMCEM </div>;
     return <>Loading...NU SHEMCEM</>;
   }
-  console.log("sjnsjkqnsknsbhjwbshjbwhjsbkwjbsq");
 
   if (!props) return <div>404</div>;
   return (
