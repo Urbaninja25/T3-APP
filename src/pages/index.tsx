@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 
 import { type NextPage } from "next";
 
@@ -117,7 +117,7 @@ const Postview = (props: PostWithUser) => {
 
 interface FullPost {
   post: {
-    id: number;
+    id: string;
     // Other properties of post
   };
   author: {
