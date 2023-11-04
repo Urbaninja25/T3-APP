@@ -50,6 +50,7 @@ export default function ProfileViewPage(
     // won't happen since the query has been prefetched return <div> LOADING NU SHEMCEM </div>;
     return <>Loading...NU SHEMCEM</>;
   }
+  console.log("sjnsjkqnsknsbhjwbshjbwhjsbkwjbsq");
 
   if (!props) return <div>404</div>;
   return (
