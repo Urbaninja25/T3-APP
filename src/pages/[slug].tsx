@@ -8,6 +8,9 @@ import { appRouter } from "~/server/api/root";
 import superjson from "superjson";
 import Head from "next/head";
 import { db } from "~/server/db";
+import { PageLayout } from "~/componenets/layout";
+import Image from "next/image";
+import { useUser } from "@clerk/nextjs";
 
 // The getServerSideProps function is used to fetch data on the server and pass it to the component as props. This can be used to improve the performance of the application by prefetching data and rendering the page on the server.
 export async function getServerSideProps(
@@ -49,22 +52,39 @@ export default function ProfileViewPage(
   props: InferGetServerSidePropsType<typeof getServerSideProps>,
 ) {
   const { username } = props;
-
-  const userQuery = api.profile.getUserByUsername.useQuery({ username });
-  if (userQuery.status !== "success") {
-    // won't happen since the query has been prefetched return <div> LOADING NU SHEMCEM </div>;
-    return <>Loading...NU SHEMCEM</>;
-  }
+  const { user } = useUser();
+  // ???????????????
+  // const userQuery = api.profile.getUserByUsername.useQuery({ username });
+  // if (userQuery.status !== "success") {
+  //   // won't happen since the query has been prefetched return <div> LOADING NU SHEMCEM </div>;
+  //   return <>Loading...NU SHEMCEM</>;
+  // }
 
   if (!props) return <div>404</div>;
+
+  if (!user) return null;
+
   return (
     <>
       <Head>
         <title>{username}</title>
       </Head>
-      <main className="flex justify-center">
-        <div>{props.username}</div>
-      </main>
+      <PageLayout>
+        <div className=" relative h-36  bg-slate-600">
+          <Image
+            src={user.imageUrl}
+            alt={`${
+              user.username ?? user.externalId ?? "unknown"
+            }'s profile pic`}
+            width={128}
+            height={128}
+            className=" absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-full border-2 "
+          />
+        </div>
+        <div className="h-[64px]"></div>
+        <div className="p-4 text-2xl font-bold">{`@${props.username}`}</div>
+        <div className="w-full border-b border-slate-400" />
+      </PageLayout>
     </>
   );
 }
