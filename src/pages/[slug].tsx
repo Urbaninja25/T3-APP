@@ -10,9 +10,6 @@ import Head from "next/head";
 import { db } from "~/server/db";
 import { PageLayout } from "~/componenets/layout";
 import Image from "next/image";
-import { useUser } from "@clerk/nextjs";
-import { filterUserForClient } from "~/server/helpers/filterUserForClient";
-
 // The getServerSideProps function is used to fetch data on the server and pass it to the component as props. This can be used to improve the performance of the application by prefetching data and rendering the page on the server.
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ slug: string }>,
