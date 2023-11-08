@@ -10,6 +10,27 @@ import Head from "next/head";
 import { db } from "~/server/db";
 import { PageLayout } from "~/componenets/layout";
 import Image from "next/image";
+// !!!!!!!
+import { LoadingPage } from "~/componenets/loading";
+import { PostView } from "~/componenets/postView";
+//!!!!!!!!!!!
+const ProfileFeed = (props: { userId: string }) => {
+  const { data, isLoading } = api.post.getPostsByUserId.useQuery({
+    userId: props.userId,
+  });
+  if (isLoading) return <LoadingPage />;
+
+  if (!data || data.length === 0) return <div>User has not posted</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
 // The getServerSideProps function is used to fetch data on the server and pass it to the component as props. This can be used to improve the performance of the application by prefetching data and rendering the page on the server.
 export async function getServerSideProps(
   context: GetServerSidePropsContext<{ slug: string }>,
@@ -80,6 +101,7 @@ export default function ProfileViewPage(
         <div className="h-[64px]"></div>
         <div className="p-4 text-2xl font-bold">{`@${props.username}`}</div>
         <div className="w-full border-b border-slate-400" />
+        <ProfileFeed userId={data.id} />
       </PageLayout>
     </>
   );
