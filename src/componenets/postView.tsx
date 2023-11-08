@@ -19,24 +19,22 @@ export const PostView = (props: PostWithUser) => {
       <Image
         src={author.imageUrl}
         className="h-14 w-14 rounded-full"
-        alt={`${author.username}'s profile picture`}
+        alt={`@${author.username}'s profile picture`}
         width={56}
         height={56}
       />
       <div className="flex flex-col">
-        <div className="flex gap-1  font-bold ">
-          {/* next js link component which are more fast and powerful */}
-          {/* why on that link we go to slug pag icant figure put ???????? */}
+        <div className="flex gap-1 text-slate-300">
           <Link href={`/@${author.username}`}>
-            <span className="text-slate-300">{`@${author.username}`}</span>
+            <span>{`@${author.username} `}</span>
           </Link>
           <Link href={`/post/${post.id}`}>
-            <span className="font-thin text-gray-400 antialiased">{`· ${dayjs(
+            <span className="font-thin">{` · ${dayjs(
               post.created_at,
             ).fromNow()}`}</span>
           </Link>
         </div>
-        <span className="text-xl">{post.content}</span>
+        <span className="text-2xl">{post.content}</span>
       </div>
     </div>
   );
