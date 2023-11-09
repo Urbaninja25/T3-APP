@@ -27,7 +27,7 @@ const config = {
     ignoreDuringBuilds: true,
   },
   //experimental flag for using swc teh minidfier instead of babbel which speed up buildup as well
-  swcMinify: true,
+  // swcMinify: true,
 };
 
 export default config;
