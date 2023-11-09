@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  DATABASE_URL: ${{ 'mysql://b89t854c1crm175t131s:pscale_pw_oN6oKbYPdFn8CTotxI8Ee99532Ttw59JhfbW6xxqoZZ@aws.connect.psdb.cloud/t3-db?sslaccept=strict' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
