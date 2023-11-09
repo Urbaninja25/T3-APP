@@ -1,4 +1,3 @@
-
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
@@ -14,7 +13,6 @@ export async function getServerSideProps(
 ) {
   const ssg = getServerSidePropsHelper();
 
-  // ?????????
   const id = context.params?.id;
 
   if (typeof id !== "string") throw new Error("no id");
@@ -48,5 +46,3 @@ export default function SinglePostPage(
     </>
   );
 }
-
-

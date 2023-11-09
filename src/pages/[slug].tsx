@@ -88,8 +88,3 @@ export default function ProfileViewPage(
     </>
   );
 }
-
-// //?????
-// export const getStaticPaths = () => {
-//   return { paths: [], fallback: "blocking" };
-// };

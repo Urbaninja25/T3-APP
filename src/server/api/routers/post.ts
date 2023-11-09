@@ -20,7 +20,9 @@ const addUserDataToPosts = async (posts: Post[]) => {
       userId: posts.map((post: { authorId: string }) => post.authorId),
       limit: 100,
     })
-  ).map(filterUserForClient);
+  )
+    //Yes, the code map(filterUserForClient) is a shorthand way to use the map function when you want to apply a specific transformation or function to each element of an array. In this case, it's using the map function to apply the filterUserForClient function to each element in the array.
+    .map(filterUserForClient);
 
   return posts.map((post) => {
     const author = users.find((user) => user.id === post.authorId);
@@ -51,7 +53,6 @@ const ratelimit = new Ratelimit({
 });
 
 export const postRouter = createTRPCRouter({
-  // !!!!!
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -61,7 +62,6 @@ export const postRouter = createTRPCRouter({
 
       if (!post) throw new TRPCError({ code: "NOT_FOUND" });
 
-      // ?????????????????????
       return (await addUserDataToPosts([post]))[0];
     }),
   getAll: publicProcedure.query(async ({ ctx }) => {
