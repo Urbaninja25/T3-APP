@@ -19,9 +19,9 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
-  //??????????? really should have it here its a good practice?
+
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 };
 
