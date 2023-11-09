@@ -9,7 +9,10 @@ on:
       - main
 
 env:
-  DATABASE_URL: ${{ 'mysql://b89t854c1crm175t131s:pscale_pw_oN6oKbYPdFn8CTotxI8Ee99532Ttw59JhfbW6xxqoZZ@aws.connect.psdb.cloud/t3-db?sslaccept=strict' }}
+  # That's correct. You should not include your GitHub Actions workflow YAML files in your .gitignore file, as GitHub relies on these workflow files to configure and run your CI/CD processes. Excluding them from version control would prevent GitHub from executing the workflows.
+
+  # ამიტომ არ მაქ აქ ნამდვილი db url
+  DATABASE_URL: "https://fake.com"
 
 jobs:
   build:
