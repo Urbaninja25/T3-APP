@@ -1,12 +1,6 @@
 name: CI
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: [push, pull_request]
 
 env:
   # That's correct. You should not include your GitHub Actions workflow YAML files in your .gitignore file, as GitHub relies on these workflow files to configure and run your CI/CD processes. Excluding them from version control would prevent GitHub from executing the workflows.
