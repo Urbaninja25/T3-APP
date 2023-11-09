@@ -21,7 +21,9 @@ const config = {
   },
 
   // ასე ვეუბნებით vercal ს რო მოდი რა შენ უბრალოდ build ი გააკეთე და კოდის ჩეკს თავი დაანებეო რადგან ვიცით რომ ამას github ci გააკეთებს
-  typescript: { ignoreBuildErrors: true },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 
   eslint: {
     ignoreDuringBuilds: true,
