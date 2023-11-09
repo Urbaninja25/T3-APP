@@ -51,6 +51,19 @@ const ratelimit = new Ratelimit({
 });
 
 export const postRouter = createTRPCRouter({
+  // !!!!!
+  getById: publicProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.db.post.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!post) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // ?????????????????????
+      return (await addUserDataToPosts([post]))[0];
+    }),
   getAll: publicProcedure.query(async ({ ctx }) => {
     const posts = await ctx.db.post.findMany({
       take: 100,
@@ -58,10 +71,10 @@ export const postRouter = createTRPCRouter({
         created_at: "desc",
       },
     });
-    // !!!!!!!!!!!!!
+
     return addUserDataToPosts(posts);
   }),
-  // !!!!!!!!!!!!!!!!!
+
   getPostsByUserId: publicProcedure
     .input(
       z.object({
@@ -77,7 +90,7 @@ export const postRouter = createTRPCRouter({
           take: 100,
           orderBy: [{ created_at: "desc" }],
         })
-        // !!!!!!!აქ posts უკვე ხელმისაწვდომია და returned value არი ამიტომ გამოდის ეს then ში function without  posts parameter.its already there
+
         .then(addUserDataToPosts),
     ),
 
@@ -89,7 +102,7 @@ export const postRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const authorId = ctx.userId;
-      // !!!!!!!! so when we call rate limiter it will return success which can be boolien and Whether the request may pass(true) or exceeded the limit(false).ALSO WE CAN LIMIT WITH IP ADRESS OR SO MANY OTHER THINGS
+
       const { success } = await ratelimit.limit(authorId);
       if (!success) {
         throw new TRPCError({
