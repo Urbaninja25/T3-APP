@@ -33,6 +33,7 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
+    // NUGII ITS ENV VARIABLES WE NEED DURING RUNTIME.NODE ENVIROMENT WILL COME WITH THE ENVIROMENT ITSELF SO WE DONT NEED TO DO ANYTHING THERE
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
