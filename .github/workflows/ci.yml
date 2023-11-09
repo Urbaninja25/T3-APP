@@ -20,7 +20,7 @@ jobs:
         run: npm install
 
       - name: Run TypeScript Type Checking
-        run: npm run type-check
+        run: npm run typecheck
 
       - name: Run ESLint
         run: npm run lint
