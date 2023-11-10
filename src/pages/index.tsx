@@ -14,11 +14,10 @@ import { PageLayout } from "~/componenets/layout";
 import { PostView } from "~/componenets/postView";
 
 const CreatePostWizard = () => {
+  const [input, setInput] = useState("");
   const { user } = useUser();
 
-  const [input, setInput] = useState("");
-
-  const ctx = api.useContext();
+  const ctx = api.useUtils();
 
   const { mutate, isLoading: isPosting } = api.post.create.useMutation({
     onSuccess: () => {
