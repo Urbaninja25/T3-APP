@@ -1,5 +1,4 @@
 import { type AppType } from "next/app";
-// !!!!!!!
 import { Toaster } from "react-hot-toast";
 import { api } from "~/utils/api";
 import Head from "next/head";
