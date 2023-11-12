@@ -41,6 +41,7 @@ const CreatePostWizard = () => {
         alt="users profile image"
         width={56}
         height={56}
+        priority
       />
       <input
         placeholder="Type something!"
