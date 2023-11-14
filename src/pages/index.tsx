@@ -122,7 +122,7 @@ const Home: NextPage = () => {
           </div>
         )}
         {isSignedIn && CreatePostWizard()}
-        {isSignedIn && <UserButton />}
+        {isSignedIn && <UserButton afterSignOutUrl="/" />}
       </div>
       <Feed />
     </PageLayout>
