@@ -13,6 +13,7 @@ export const PostView = (props: PostWithUser) => {
   const { post, author } = props;
 
   const router = useRouter();
+  const isBasePage = router.pathname === "/";
 
   const handlePostClick = async (event: React.MouseEvent<HTMLDivElement>) => {
     const isUsernameLink = (event.target as HTMLElement).closest(
@@ -47,7 +48,10 @@ export const PostView = (props: PostWithUser) => {
             ).fromNow()}`}</span>
           </Link>
         </div>
-        <span className="text-2xl" style={{ cursor: "pointer" }}>
+        <span
+          className="text-2xl"
+          style={{ cursor: isBasePage ? "pointer" : "auto" }}
+        >
           {post.content}
         </span>
       </div>
