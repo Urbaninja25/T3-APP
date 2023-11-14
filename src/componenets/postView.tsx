@@ -47,7 +47,9 @@ export const PostView = (props: PostWithUser) => {
             ).fromNow()}`}</span>
           </Link>
         </div>
-        <span className="text-2xl">{post.content}</span>
+        <span className="text-2xl" style={{ cursor: "pointer" }}>
+          {post.content}
+        </span>
       </div>
     </div>
   );
